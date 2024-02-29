@@ -14,6 +14,7 @@ var obstacles
 var obstacle1Image
 var obstacle2Image
 var lifeImg
+var blastImage
 
 var playerCount = 0,gameState = 0;
 
@@ -27,6 +28,7 @@ function preload() {
   obstacle1Image=loadImage("./assets/obstacle1.png")
   obstacle2Image=loadImage("./assets/obstacle2.png")
   lifeImg=loadImage("./assets/life.png")
+  blastImage=loadImage("./assets/blast.png")
 
 }
 

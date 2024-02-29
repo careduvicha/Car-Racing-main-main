@@ -58,7 +58,8 @@ class Player {
         positionX:this.positionX,
         positionY:this.positionY,
         ranking:this.ranking,
-        score:this.score
+        score:this.score,
+        life:this.life
       })
   }
   static getPlayersInfo(){
@@ -88,7 +89,8 @@ class Player {
       positionX:this.positionX,
       positionY:this.positionY,
         ranking:this.ranking,
-        score:this.score
+        score:this.score,
+        life:this.life
     })
 
   }

@@ -6,6 +6,8 @@ class Game {
     this.leader1 = createElement("h2");
     this.leader2 = createElement("h2");
     this.playerMoving = false
+    this.leftKeyActive = false
+    this.blast = false
   }
 
   start() {
@@ -37,10 +39,12 @@ class Game {
   spriteCreate() {
     car1 = createSprite(width / 2 - 50, height - 100);
     car1.addImage("car1", carImg1);
+    car1.addImage("blast",blastImage)
     car1.scale = 0.07;
 
     car2 = createSprite(width / 2 + 100, height - 100);
     car2.addImage("car2", carImg2);
+    car2.addImage("blast",blastImage)
     car2.scale = 0.07;
 
     cars = [car1, car2];
@@ -124,13 +128,29 @@ class Game {
         var y = height - allPlayers[plr].positionY;
         cars[index - 1].position.x = x;
         cars[index - 1].position.y = y;
-
+        var currentLife=allPlayers[plr].life
+        if(currentLife<=0){
+          cars[index-1].changeImage("blast")
+          cars[index-1].scale=0.3
+        }
         if (index == player.index) {
           fill("blue");
           stroke(10);
           ellipse(x, y, 70, 80);
           this.handleCoins(index)
           this.handleFuel(index)
+          this.handleObstaclesCollision(index)
+          this.handleCarsCollision(index)
+          if(player.life<=0){
+            this.blast=true
+            this.playerMoving=false
+            
+            setTimeout(() => {
+              gameState=2
+              this.gameOver()
+            }, 2000);
+            
+          }
 
           camera.position.y = cars[index - 1].position.y;
         }
@@ -153,19 +173,24 @@ class Game {
     }
   }
   handlePlayerControls() {
-    if (keyIsDown(UP_ARROW)) {
-      player.positionY += 10;
-      this.playerMoving=true
-      player.update();
+    if(!this.blast){
+      if (keyIsDown(UP_ARROW)) {
+        player.positionY += 10;
+        this.playerMoving=true
+        player.update();
+      }
+      if (keyIsDown(RIGHT_ARROW) && player.positionX < width / 2 + 300) {
+        player.positionX += 5;
+        this.leftKeyActive=false
+        player.update();
+      }
+      if (keyIsDown(LEFT_ARROW) && player.positionX > width / 3 - 50) {
+        player.positionX -= 5;
+        this.leftKeyActive=true
+        player.update();
+      }
     }
-    if (keyIsDown(RIGHT_ARROW) && player.positionX < width / 2 + 300) {
-      player.positionX += 5;
-      player.update();
-    }
-    if (keyIsDown(LEFT_ARROW) && player.positionX > width / 3 - 50) {
-      player.positionX -= 5;
-      player.update();
-    }
+   
   }
   showLeaderBoard() {
     var leader1, leader2;
@@ -252,7 +277,7 @@ class Game {
   gameOver() {
     swal({
       title: `Fim de Jogo`,
-      text: `Oops, ${player.name} você perdeu a corrida!`,
+      text: `Oops, ${player.name} você não chegou ao fim ;-;`,
       imageUrl:
         "https://cdn.shopify.com/s/files/1/1061/1924/products/Thumbs_Down_Sign_Emoji_Icon_ios10_grande.png",
       imageSize: "100x100",
@@ -292,4 +317,49 @@ class Game {
       confirmButtonText: "Obrigado por jogar"
     });
   }
+  handleObstaclesCollision(index){
+    if(cars[index-1].collide(obstacles)){
+      if(this.leftKeyActive){
+        player.positionX+=100
+      }else{
+        player.positionX-=100
+      }
+      if(player.life>0){
+        player.life-=185/4
+        
+      }
+      player.update()
+    }
+
+  }
+  handleCarsCollision(index){
+    if(index==1){
+      if(cars[index-1].collide(cars[1])){
+        if(this.leftKeyActive){
+          player.positionX+=100
+        }else{
+          player.positionX-=100
+        }
+        if(player.life>0){
+          player.life-=185/4
+          
+        }
+        player.update()}
+    }
+    if(index==2){
+      if(cars[index-1].collide(cars[0])){
+        if(this.leftKeyActive){
+          player.positionX+=100
+        }else{
+          player.positionX-=100
+        }
+        if(player.life>0){
+          player.life-=185/4
+          
+        }
+        player.update()}
+    }
+
+  }
+  
 }
